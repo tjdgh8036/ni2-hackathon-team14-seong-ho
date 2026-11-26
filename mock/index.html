@@ -35,7 +35,7 @@
   .seg { display: flex; background: #e6edf5; border-radius: 10px; padding: 3px; gap: 3px; }
   .seg button { flex: 1; border: 0; background: transparent; font: inherit; font-weight: 700; color: var(--sub); padding: 9px 6px; border-radius: 8px; cursor: pointer; min-height: 40px; }
   .seg button[aria-selected="true"] { background: #fff; color: var(--navy); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
-  .procs { display: flex; gap: 6px; overflow-x: auto; padding-top: 9px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .procs { display: flex; flex-wrap: wrap; gap: 6px; overflow: visible; padding-top: 9px; }
   .procs::-webkit-scrollbar { display: none; }
   .procs button { flex: 0 0 auto; border: 1px solid var(--line); background: #fff; color: var(--text); font: inherit; font-size: .86rem; padding: 7px 13px; border-radius: 999px; cursor: pointer; min-height: 36px; white-space: nowrap; }
   .procs button[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; font-weight: 700; }
@@ -171,7 +171,6 @@
     <div class="brand">
       <div><h1 id="appName"><span class="vs-a">VINA</span><span class="vs-b">Safe</span></h1><p>신입 작업자를 위한 공정 Q&amp;A · 안전 체크리스트</p></div>
     </div>
-    <div class="sample">시제품 · 공정 문서는 모두 <b>샘플 데이터</b>이며 실제 규정이 아닙니다. <b>법령</b>·<b>교수님 인터뷰</b> 배지가 붙은 근거는 샘플이 아닌 실제 법령 조문·인터뷰 내용입니다.</div>
   </header>
 
   <div class="bar">
@@ -197,7 +196,7 @@
 (function () {
   "use strict";
 
-  var PROCESSES = ["전체", "전극 코팅", "셀 조립", "전해액 주입·밀봉", "충방전·내전압 시험", "품질검사(QC)", "모듈 조립"];
+  var PROCESSES = ["전극 코팅", "셀 조립", "충방전·내전압 시험", "품질검사(QC)"];   /* 탭에서 제외: 전체, 전해액 주입·밀봉, 모듈 조립 (내부 기본값 "전체"는 유지) */
   var FAQS = ["극성을 반대로 연결했으면?", "충방전 시간은 왜 지켜야 해?", "필수 보호구는?", "위험하면 작업 멈춰도 돼요?", "괴롭힘 신고하면 불이익 있어요?", "신입이 하지 말아야 할 것은?"];
   var NOTICE = "즉시 작업을 멈추고 담당자에게 알리세요";
 
@@ -235,7 +234,7 @@
     violence: ["폭행", "폭력", "때리", "때렸", "때려", "맞았", "맞아서", "구타", "손찌검"],
     harass: ["괴롭힘", "괴롭혀", "욕설", "폭언", "갑질", "무시당", "무시받", "무시를", "따돌"],
     report: ["신고", "제보", "보복"],
-    /* 신입 하지 말 것 (교수님 인터뷰 등) */
+    /* 신입 하지 말 것 (전문가 자문 등) */
     donts: ["하지말", "하면안", "금지", "금물", "하지마"],
     alone: ["혼자", "지시받지", "모르는작업", "모르면"],
     hood: ["두건", "머리카락", "먼지"],
@@ -345,7 +344,7 @@
       excerpt: "작업 시작 전 작업 전 대화(TBM)에 참석한다.",
       summary: "작업 시작 전 작업 전 대화(TBM)에 참석하세요." },
 
-    /* ===== 신입(1~3개월)이 공정별로 하지 말아야 할 것 (교수님 인터뷰 / 일반 안내) =====
+    /* ===== 신입(1~3개월)이 공정별로 하지 말아야 할 것 (전문가 자문 / 일반 안내) =====
        공통 항목과 ①전극·②셀 조립의 중복 항목은 하나로 합침. 급박한 위험 항목은 제52조 문서(st1)에 포함. */
     { id: "dn_alone", process: "전 공정", doc: DN_NO, clause: "공통", needs: [["alone"]], dont: true,
       excerpt: "모르는 작업이나 지시받지 않은 작업을 혼자 시작하지 않기. 모르면 먼저 묻기",
@@ -382,7 +381,7 @@
       summary: "❌ 앞뒤 공정을 모르는 채로 짐작해서 처리하지 않기. 헷갈리면 묻기" },
     { id: "dn_mod", process: "모듈 조립", doc: DN_IV, clause: "⑥ 모듈 조립", needs: [["module"]], dont: true,
       excerpt: "셀이 여러 개 묶인 모듈을 개별 셀처럼 가볍게 다루지 않기. 여러 개가 연결되면 전압이 높아져요.",
-      summary: "❌ 셀이 여러 개 묶인 모듈을 개별 셀처럼 가볍게 다루지 않기. 여러 개가 연결되면 전압이 높아져요.(교수님 인터뷰의 고전압 내용과 같은 이유)" },
+      summary: "❌ 셀이 여러 개 묶인 모듈을 개별 셀처럼 가볍게 다루지 않기. 여러 개가 연결되면 전압이 높아져요.(전문가 자문의 고전압 내용과 같은 이유)" },
 
     /* ===== 법령 문서 (실제 조문, 문서명에 "(법령)" 포함 시 '법령' 배지) =====
        산업안전보건법 [시행 2026.10.27, 법률 제22122호] / 근로기준법 [시행 2026.10.8, 법률 제21533호]
@@ -399,8 +398,7 @@
       summary: "지위나 관계의 우위를 이용해 업무상 적정범위를 넘어 신체적·정신적 고통을 주거나 근무환경을 악화시키는 행위는 금지돼요. 이 앱은 조문만 안내하고, 내 상황이 괴롭힘인지는 판단하지 않아요." },
     { id: "lb76_3", process: "근무·고충", doc: LAW_LSA, clause: "제76조의3 제1항~제3항·제6항·제7항", needs: [["harass", "report"]], incident: true,
       excerpt: "누구든지 직장 내 괴롭힘 발생 사실을 알게 된 경우 그 사실을 사용자에게 신고할 수 있다. 사용자는 신고한 근로자 및 피해근로자등에게 해고나 그 밖의 불리한 처우를 하여서는 아니 된다.",
-      summary: "누구든지 괴롭힘 사실을 알게 되면 사용자에게 신고할 수 있어요. 사용자는 지체 없이 객관적으로 조사해야 하고, 조사 기간에 피해근로자를 보호하려고 근무장소 변경, 유급휴가 명령 등 적절한 조치를 해야 해요. 신고자와 피해근로자에게 해고나 불리한 처우를 하면 3년 이하의 징역 또는 3천만 원 이하의 벌금이에요(제109조 제1항). 조사에 참여한 사람은 알게 된 비밀을 피해근로자의 의사에 반해 누설할 수 없어요.",
-      note: "사내 신고 창구는 비나텍 자료를 받은 뒤 추가할 예정이에요. (확인 필요)" }
+      summary: "누구든지 괴롭힘 사실을 알게 되면 사용자에게 신고할 수 있어요. 사용자는 지체 없이 객관적으로 조사해야 하고, 조사 기간에 피해근로자를 보호하려고 근무장소 변경, 유급휴가 명령 등 적절한 조치를 해야 해요. 신고자와 피해근로자에게 해고나 불리한 처우를 하면 3년 이하의 징역 또는 3천만 원 이하의 벌금이에요(제109조 제1항). 조사에 참여한 사람은 알게 된 비밀을 피해근로자의 의사에 반해 누설할 수 없어요." }
   ];
   var BY_ID = {}; DOCS.forEach(function (d) { BY_ID[d.id] = d; });
   var STOP = BY_ID["st1"];
@@ -479,11 +477,11 @@
         .map(function (x) { return x.d; });
       return { status: "OK", emergency: false, compact: true,
         answer: dl.map(function (d) {
-          var basis = d.doc.indexOf("(인터뷰)") >= 0 ? " (교수님 인터뷰)" : (d.doc.indexOf("(법령)") >= 0 ? " (산업안전보건법 제52조)" : " (별도 근거 없음)");
+          var basis = d.doc.indexOf("(인터뷰)") >= 0 ? " (전문가 자문)" : (d.doc.indexOf("(법령)") >= 0 ? " (산업안전보건법 제52조)" : " (별도 근거 없음)");
           return "[" + (d.process === "전 공정" ? "공통" : d.process) + "] " + (d.dontText || d.summary) + basis;
         }),
         sources: dl.map(toSrc), related: [],
-        note: "신입(1~3개월) 기준 안내예요. 교수님 인터뷰와 산업안전보건법을 바탕으로 한 내용이며 비나텍의 공식 규정이 아니에요. 현장 지시와 다르면 작업을 멈추고 관리감독자에게 확인하세요." };
+        note: "신입(1~3개월) 기준 안내예요. 전문가 자문과 산업안전보건법을 바탕으로 한 내용이며 비나텍의 공식 규정이 아니에요. 현장 지시와 다르면 작업을 멈추고 관리감독자에게 확인하세요." };
     }
     var hits = rank(pool, m);
     var mistake = has(q, MISTAKE), reason = has(q, REASON);
@@ -542,7 +540,7 @@
   function addGreeting() {
     var row = el("div", "msg bot"); var b = el("div", "bubble");
     b.appendChild(el("div", "", "안녕하세요, 비나세이프예요. 궁금한 것을 물어보세요. 공정은 '안전 체크리스트' 탭에서 고를 수 있어요. 샘플 문서나 법령에 근거가 있는 내용만 답하고, 없으면 담당자 확인이 필요하다고 알려드려요."));
-    b.appendChild(el("div", "note", "법령 근거: 산업안전보건법(시행 2026.10.27), 근로기준법(시행 2026.10.8). 국가법령정보센터, 2026-11-26 열람. 조문만 안내하며 개별 사건의 판단은 하지 않아요. \"신입이 하지 말아야 할 것\"은 교수님 인터뷰와 법령 기반 안내예요."));
+    b.appendChild(el("div", "note", "답변에 쓴 법령은 산업안전보건법(2026년 10월 27일 시행)과 근로기준법(2026년 10월 8일 시행)이에요. 국가법령정보센터에서 2026년 11월 26일에 확인했어요. 저는 조문을 쉽게 풀어서 알려드릴 뿐, 지금 겪는 일이 법에 맞는지는 판단하지 못해요. \"신입이 하지 말아야 할 것\"은 전문가 자문과 법령을 바탕으로 한 안내예요."));
     b.appendChild(el("div", "note", "자주 묻는 질문"));
     b.appendChild(faqChips());
     row.appendChild(b); main.appendChild(row);
@@ -550,7 +548,7 @@
   function srcCard(s, ref) {
     var c = el("div", "card" + (ref ? " ref" : ""));
     var nm = el("div", "n", s.doc_name.replace(/\((법령|인터뷰|일반)\)/, ""));
-    [["(법령)", "법령", "lawb"], ["(인터뷰)", "교수님 인터뷰", "ivb"], ["(일반)", "별도 근거 없음", "nob"]].forEach(function (bd) {
+    [["(법령)", "법령", "lawb"], ["(인터뷰)", "전문가 자문", "ivb"], ["(일반)", "별도 근거 없음", "nob"]].forEach(function (bd) {
       if (s.doc_name.indexOf(bd[0]) >= 0) nm.appendChild(el("span", bd[2], bd[1]));
     });
     c.appendChild(nm); c.appendChild(el("div", "c", s.clause));
