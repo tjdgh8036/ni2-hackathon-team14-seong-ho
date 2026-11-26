@@ -231,9 +231,9 @@
     ppecheck: ["손상", "기한", "유효", "파손", "보호구점검"],
     tbm: ["tbm", "작업전대화", "조회", "미팅"],
     /* 법령 근거용 (작업중지권, 근무·고충). 질문은 공백 없는 형태로 비교하므로 키워드도 공백 없이 */
-    stopwork: ["작업중지", "작업중단", "멈춰", "멈추", "멈췄", "멈춘", "대피", "급박", "중지"],
-    violence: ["폭행", "폭력", "때리", "때렸", "때려", "맞았", "손찌검"],
-    harass: ["괴롭힘", "괴롭혀", "욕설", "폭언", "갑질", "무시당", "따돌"],
+    stopwork: ["작업중지", "작업중단", "멈춰", "멈추", "멈췄", "멈춘", "대피", "급박", "중지", "혼나", "혼날"],
+    violence: ["폭행", "폭력", "때리", "때렸", "때려", "맞았", "맞아서", "구타", "손찌검"],
+    harass: ["괴롭힘", "괴롭혀", "욕설", "폭언", "갑질", "무시당", "무시받", "무시를", "따돌"],
     report: ["신고", "제보", "보복"],
     /* 신입 하지 말 것 (교수님 인터뷰 등) */
     donts: ["하지말", "하면안", "금지", "금물", "하지마"],
@@ -253,6 +253,8 @@
   var DOMAIN = ["공정", "시험", "안전", "작업", "셀", "전극", "충방전", "내전압", "검사", "qc", "배터리", "설비", "담당자", "규정", "수칙", "조항", "체크리스트",
     "상급자", "상사", "선임", "반장", "폭력", "괴롭힘", "신고", "고충", "불이익", "해고", "혼나"];
   var GREET = ["안녕", "hello", "하이", "반가", "고마", "감사"];
+  /* 이번 시제품 범위 밖 (회사 취업규칙에 따라 다름 → 나중에 고려). 질문은 공백 없는 형태로 비교 */
+  var EXCLUDED = ["근로시간", "근무시간", "휴게", "휴일", "휴가", "연차", "출퇴근", "출근", "퇴근", "지각", "결근", "야근", "초과근무", "연장근무", "급여", "월급"];
 
   /* ===== 샘플 문서 (실제 규정 아님). needs: 모든 묶음에서 최소 1개 개념이 질문에 있어야 함 ===== */
   var CH = "충방전·내전압 시험 안전수칙(샘플)", CO = "전극 코팅 작업 안전수칙(샘플)",
@@ -455,6 +457,11 @@
     var anyConcept = Object.keys(m).length > 0;
     var domain = anyConcept || has(q, DOMAIN) || emergency;
 
+    // 근로시간·휴게·휴일·출퇴근·지각·결근은 범위 밖이라고 구체적으로 안내 (사고·이상 징후 표현이 있으면 일반 검색으로 진행)
+    if (!emergency && !anyConcept && has(q, EXCLUDED)) {
+      return { status: "OUT_OF_SCOPE", emergency: false, answer: [], sources: [], related: [],
+        warning: "근로시간, 휴게, 휴일, 출퇴근, 지각·결근 처리는 이번 비나세이프의 범위가 아니에요. 회사 취업규칙에 따라 달라서 담당자에게 확인해 주세요." };
+    }
     if (!domain) {
       if (has(q, GREET)) return { status: "GREETING", emergency: false, answer: [], sources: [], related: [] };
       return { status: "OUT_OF_SCOPE", emergency: false, answer: [], sources: [], related: [],
@@ -680,7 +687,7 @@
   buildProcs(); renderChat();
 })();
 </script>
-<script>/* === 베트남어 토글 / 글자 크기 / 피드백 확장 === */
+<script>/* 베트남어 토글 */
 (() => {
   if (window.__viToggleLoaded) return; window.__viToggleLoaded = true;
   const HAN = /[가-힣]/, KEY = 'vina_vi_cache_v1', PREF = 'vina_vi_on';
@@ -829,7 +836,7 @@
       while ((n = w.nextNode())) if (!skip(n) && HAN.test(n.nodeValue)) out.add(n.nodeValue.trim()); };
     const tabs = [...document.querySelectorAll('[role=tab]')];
     const selTab = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
-    const chipSel = () => [...document.querySelectorAll('[role=group] button')];
+    const chipSel = () => [...document.querySelectorAll('[role=group]:not(#fs-toggle) button')];
     const active = () => chipSel().findIndex(b => b.getAttribute('aria-pressed') === 'true' || b.getAttribute('aria-checked') === 'true' || b.classList.contains('active') || b.classList.contains('on') || b.classList.contains('selected'));
     const selChip = active();
     try {
@@ -842,7 +849,9 @@
   const warm = () => translateMany(literals()).then(() => translateMany(crawlTexts())).then(() => { if (on) scan(document.body); });
   setTimeout(warm, 200);
   if (localStorage.getItem(PREF) === '1') setOn(true);
-})();
+})()
+</script>
+<script>/* 글자 크기 */
 (() => {
   if (window.__fsLoaded) return; window.__fsLoaded = true;
   const KEY = 'vina_font_step';
@@ -886,7 +895,9 @@
   const vi = document.getElementById('vi-toggle');
   if (vi) { vi.style.position = 'static'; tools.appendChild(vi); }
   apply();
-})();
+})()
+</script>
+<script>/* 피드백 */
 (() => {
   if (window.__fbLoaded) return; window.__fbLoaded = true;
   const KEY = 'binasafe_feedback';
@@ -962,7 +973,7 @@
     clearBtn.parentElement.insertBefore(ex, clearBtn);
     document.addEventListener('click', () => setTimeout(label, 50), true);
   }
-})();
+})()
 </script>
 </body>
 </html>
