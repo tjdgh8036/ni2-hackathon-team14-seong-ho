@@ -505,7 +505,7 @@
     }
     if (!hits.length) {
       var others = rank(DOCS, m).filter(function (d) { return pool.indexOf(d) < 0; });
-      var note = others.length ? "다른 공정(" + others[0].process + ")에 관련 문서가 있어요. 공정을 바꿔서 다시 물어보세요." : "";
+      var note = others.length ? "다른 공정(" + others[0].process + ")에 관련 문서가 있어요. 안전 체크리스트 탭에서 공정을 바꿔 다시 물어보세요." : "";
       return { status: "NEEDS_CONFIRMATION", emergency: emergency, answer: [], sources: [], related: [],
         warning: "근거 문서를 찾지 못했습니다. 담당자 확인 필요", note: note };
     }
@@ -514,7 +514,7 @@
     if (process !== "전체" && bestAll && pool.indexOf(bestAll) < 0 && scoreDoc(bestAll, m) > scoreDoc(hits[0], m)) {
       return { status: "NEEDS_CONFIRMATION", emergency: emergency, answer: [], sources: [], related: [],
         warning: "근거 문서를 찾지 못했습니다. 담당자 확인 필요",
-        note: "다른 공정(" + bestAll.process + ")에 더 맞는 문서가 있어요. 공정을 바꿔서 다시 물어보세요." };
+        note: "다른 공정(" + bestAll.process + ")에 더 맞는 문서가 있어요. 안전 체크리스트 탭에서 공정을 바꿔 다시 물어보세요." };
     }
     var shown = hits.slice(0, 3);
     var multi = new Set(shown.map(function (d) { return d.process; })).size > 1 || process === "전체";
@@ -525,7 +525,7 @@
     var notes = [];
     shown.forEach(function (d) { if (d.note) notes.push(d.note); });
     if (reason) notes.push("이유나 배경 설명은 문서에 없어요. 궁금하면 담당자에게 확인하세요.");
-    if (hits.length > 3) notes.push("관련 문서가 " + hits.length + "개 있어 3개만 보여드려요. 공정을 고르면 더 정확해져요.");
+    if (hits.length > 3) notes.push("관련 문서가 " + hits.length + "개 있어 3개만 보여드려요. 안전 체크리스트 탭에서 공정을 고르면 더 정확해져요.");
     return { status: "OK", emergency: emergency, answer: answer, sources: shown.map(toSrc), related: [], note: notes.join(" ") };
   }
 
@@ -541,7 +541,7 @@
   }
   function addGreeting() {
     var row = el("div", "msg bot"); var b = el("div", "bubble");
-    b.appendChild(el("div", "", "안녕하세요, 비나세이프예요. 위에서 공정을 고르고 궁금한 것을 물어보세요. 샘플 문서나 법령에 근거가 있는 내용만 답하고, 없으면 담당자 확인이 필요하다고 알려드려요."));
+    b.appendChild(el("div", "", "안녕하세요, 비나세이프예요. 궁금한 것을 물어보세요. 공정은 '안전 체크리스트' 탭에서 고를 수 있어요. 샘플 문서나 법령에 근거가 있는 내용만 답하고, 없으면 담당자 확인이 필요하다고 알려드려요."));
     b.appendChild(el("div", "note", "법령 근거: 산업안전보건법(시행 2026.10.27), 근로기준법(시행 2026.10.8). 국가법령정보센터, 2026-11-26 열람. 조문만 안내하며 개별 사건의 판단은 하지 않아요. \"신입이 하지 말아야 할 것\"은 교수님 인터뷰와 법령 기반 안내예요."));
     b.appendChild(el("div", "note", "자주 묻는 질문"));
     b.appendChild(faqChips());
@@ -669,6 +669,7 @@
     $("tab-chat").setAttribute("aria-selected", t === "chat");
     $("tab-check").setAttribute("aria-selected", t === "check");
     $("composer").classList.toggle("hidden", t !== "chat");
+    $("procs").classList.toggle("hidden", t === "chat"); // 공정 선택은 안전 체크리스트 탭에서만 보이기
     if (t === "chat") { renderChat(); } else { renderChecklist(); }
   }
   $("tab-chat").onclick = function () { setTab("chat"); };
@@ -685,6 +686,7 @@
     });
   }
   buildProcs(); renderChat();
+  $("procs").classList.add("hidden"); // 첫 화면은 대화 탭이므로 공정 버튼 숨김
 })();
 </script>
 <script>/* 베트남어 토글 */
